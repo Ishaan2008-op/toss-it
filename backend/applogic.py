@@ -295,8 +295,6 @@ for idx in range(len(sorted_teams), len(axes1)):
 
 plt.tight_layout(rect=[0, 0.02, 1, 0.99])
 plt.subplots_adjust(left=0.08, right=0.95, top=0.93, bottom=0.08, hspace=0.35, wspace=0.3)
-plt.savefig('01_toss_vs_match_win.png', dpi=300, bbox_inches='tight')
-print("\n✓ Saved: 01_toss_vs_match_win.png")
 plt.close(fig1)  # Close the figure instead of showing
 
 # ============= VISUALIZATION 2: BATTING FIRST vs FIELDING FIRST (ALL TEAMS) =============
@@ -340,12 +338,9 @@ for idx in range(len(sorted_teams), len(axes2)):
 
 plt.tight_layout(rect=[0, 0.02, 1, 0.99])
 plt.subplots_adjust(left=0.08, right=0.95, top=0.93, bottom=0.08, hspace=0.35, wspace=0.3)
-plt.savefig('02_bat_first_vs_field_first.png', dpi=300, bbox_inches='tight')
-print("✓ Saved: 02_bat_first_vs_field_first.png")
 plt.close(fig2)  # Close the figure instead of showing
 
 # ============= VISUALIZATION 3: VENUE HEATMAPS (ONE PER TEAM) =============
-print("\nGenerating venue heatmaps for each team...")
 
 for team_name in sorted_teams:
     venue_data = venue_stats[team_name]
@@ -382,18 +377,11 @@ for team_name in sorted_teams:
         plt.tight_layout(rect=[0, 0, 0.98, 0.96])
         plt.subplots_adjust(left=0.25, right=0.95, top=0.94, bottom=0.08)
         
-        filename = f'03_venue_heatmap_{team_name.replace(" ", "_")}.png'
-        plt.savefig(filename, dpi=300, bbox_inches='tight')
-        print(f"  ✓ Saved: {filename}")
         plt.close()  # Close the figure instead of showing
 
 print("\n" + "=" * 80)
 print("ANALYSIS COMPLETE!")
 print("=" * 80)
-print("\nGenerated Files:")
-print("  1. 01_toss_vs_match_win.png - Toss Win vs Match Win for all teams")
-print("  2. 02_bat_first_vs_field_first.png - Batting First vs Fielding First analysis")
-print(f"  3. 03_venue_heatmap_*.png - Individual venue heatmaps for {len(sorted_teams)} teams")
 
 print("\n" + "=" * 80)
 print("KEY INSIGHTS")
