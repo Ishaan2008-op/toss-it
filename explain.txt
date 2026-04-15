@@ -1,26 +1,14 @@
-# Detailed Explanation of applogic.py for Beginners
+# ============================================================================
+# IPL TOSS PREDICTOR & ANALYSIS - COMPLETE CODE EXPLANATION FOR BEGINNERS
+# ============================================================================
+# This document explains EVERY function, what it does, and WHY it was used.
+# Read this to understand the entire project.
+# ============================================================================
 
-This file explains the `applogic.py` script line by line, as if teaching a complete beginner. We'll go through the code, explain what each part does, why it's used, and the meaning of functions or concepts involved.
 
-## 1. Docstring (Documentation at the top)
-
-```python
-"""
-IPL Toss Predictor and Analysis
-This script performs comprehensive analysis on IPL match data including:
-1. Team name consolidation and historical data merging
-2. Data cleaning (removing draws and unplayed matches)
-3. Visualization of toss win vs match win percentages
-4. Batting first vs fielding first win analysis
-5. Venue-based win percentage heatmaps
-"""
-```
-
-**Explanation:** This is a multi-line comment (called a docstring) that describes what the script does. It's like a summary of the program's purpose. The triple quotes `"""` allow writing text over multiple lines. This helps anyone reading the code understand what the program is for without running it.
-
-**Why used:** To document the code. Good practice for others (or future you) to understand the script quickly.
-
-## 2. Imports (Bringing in tools from libraries)
+# ============================================================================
+# PART 1: IMPORTS AND SETUP (Why we import libraries)
+# ============================================================================
 
 ```python
 import pandas as pd
@@ -32,25 +20,35 @@ import warnings
 warnings.filterwarnings('ignore')
 ```
 
-**Explanation:**
-- `import pandas as pd`: Pandas is a library for working with data tables (like Excel spreadsheets). We give it the nickname `pd` to save typing.
-- `import numpy as np`: NumPy is for mathematical operations on arrays. Nicknamed `np`.
-- `import matplotlib.pyplot as plt`: Matplotlib is for creating charts and graphs. `pyplot` is the part we use, nicknamed `plt`.
-- `import seaborn as sns`: Seaborn is another graphing library that makes pretty charts. It works with matplotlib.
-- `from collections import defaultdict`: `defaultdict` is a special dictionary that creates default values for new keys automatically.
-- `import warnings`: Warnings module to handle warning messages.
-- `warnings.filterwarnings('ignore')`: Tells Python to ignore warning messages so they don't clutter the output.
+WHAT EACH IMPORT DOES:
 
-**Why used:** These are external libraries (pre-written code) that provide powerful tools for data analysis and visualization. Without them, we'd have to write everything from scratch, which would be very hard.
+1. **pandas (pd)** - WHAT: Library for handling tables/spreadsheets. Tool for handling tables/data analysis.
+   WHY: Makes working with data easy (like Excel in Python).
 
-**Meaning:** Libraries are like toolboxes. We import specific tools we need for our task.
+2. **numpy (np)** - WHAT: Library for mathematical calculations on arrays.
+   WHY: Fast math operations. We use it for statistics.
 
-## 3. Team Mapping and Constants
+3. **matplotlib.pyplot (plt)** - WHAT: Library for creating charts and graphs.
+   WHY: Visualizing data (pie charts, bar charts, line graphs).
+
+4. **seaborn (sns)** - WHAT: Library for pretty, advanced charts built on matplotlib.
+   WHY: Makes charts look professional and beautiful.
+
+5. **defaultdict** - WHAT: Special dictionary that creates default values for new keys.
+   WHY: Easier to use when creating dictionaries with many keys.
+
+6. **warnings** - WHAT: Module to handle warning messages.
+   WHY: warnings.filterwarnings('ignore') tells Python to HIDE warning messages so output looks clean.
+
+
+# ============================================================================
+# PART 2: TEAM MAPPING AND CONSOLIDATION (Preparing team data)
+# ============================================================================
+
+## Problem: The CSV file has team IDs (numbers) like 1, 2, 3, etc.
+## Solution: Create a dictionary to convert IDs → Team Names
 
 ```python
-# ============= STEP 1: TEAM MAPPING AND CONSOLIDATION =============
-
-# Map team IDs to their names and handle name changes/bans
 TEAM_MAPPING = {
     1: 'Royal Challengers Bangalore',
     2: 'Mumbai Indians',
@@ -58,46 +56,661 @@ TEAM_MAPPING = {
     4: 'Delhi Capitals',
     5: 'Rajasthan Royals',
     6: 'Punjab Kings',
-    129: 'Sunrisers Hyderabad',  # formerly Deccan Chargers
+    129: 'Sunrisers Hyderabad',
     134: 'Chennai Super Kings',
-    252: 'Rajasthan Royals',  # duplicate mapping
-    494: 'Sunrisers Hyderabad',  # consolidated
     614: 'Gujarat Titans',
     615: 'Lucknow Super Giants',
-    1414: 'Kochi Tuskers Kerala',  # disbanded 2011
-    1419: 'Pune Warriors India'     # disbanded 2013
 }
 ```
 
-**Explanation:** This is a dictionary (like a lookup table) that maps team ID numbers to team names. For example, ID 1 corresponds to 'Royal Challengers Bangalore'.
+WHY: Users don't want to see "Team 1" - they want to see "Mumbai Indians"!
 
-**Why used:** IPL data uses numbers for teams, but we want readable names. Some teams changed names or were banned, so this handles those cases.
 
-**Meaning:** A dictionary is a data structure with key-value pairs. Here, keys are numbers, values are strings (text).
+## Problem 2: Some teams changed names or had multiple IDs
+## Solution: Consolidation Map (merge old IDs into new ones)
 
 ```python
-# Teams that were added recently (post 2021) - independent status
-NEW_TEAMS_THRESHOLD = 2022
-NEWLY_ADDED_TEAMS = {614, 615}  # Gujarat Titans, Lucknow Super Giants
-
-# Teams to consolidate (merging old to new)
 CONSOLIDATION_MAP = {
-    252: 5,  # Map to Rajasthan Royals
-    494: 129,  # Map to Sunrisers Hyderabad
-    1414: 1414,  # Keep as is (disbanded)
-    1419: 1419   # Keep as is (disbanded)
+    252: 5,    # Old ID 252 was also Rajasthan Royals (ID 5) - merge them
+    494: 129,  # Old ID 494 was also Sunrisers Hyderabad (ID 129) - merge them
 }
 ```
 
-**Explanation:** More constants. `NEW_TEAMS_THRESHOLD` is a year (2022). `NEWLY_ADDED_TEAMS` is a set (unique collection) of team IDs. `CONSOLIDATION_MAP` is another dictionary for merging old team IDs to new ones.
-
-**Why used:** To define rules for handling team changes over time.
-
-**Meaning:** Constants are fixed values used throughout the program. Sets are like lists but only store unique items.
-
-## 4. Loading and Cleaning Data
+WHY: If we don't merge them, the same team appears as two different teams in statistics!
+     This makes data wrong. Example: Rajasthan Royals wins 50 matches as ID 252 and 30 as ID 5.
+     Without consolidation, they look like they won only 30 total. WITH consolidation = 80 total wins.
 
 ```python
+NEWLY_ADDED_TEAMS = {614, 615}  # Gujarat Titans, Lucknow Super Giants
+NEW_TEAMS_THRESHOLD = 2022
+```
+
+WHY: These teams joined in 2022. We might want to analyze them separately
+     because their history is too short to compare with teams since 2008.
+
+
+# ============================================================================
+# PART 3: LOADING AND CLEANING DATA (Preparing the CSV file)
+# ============================================================================
+
+```python
+df = pd.read_csv('ipl_matches_data.csv')
+```
+
+WHAT: Reads the CSV file into a table (called DataFrame or df)
+WHY: We need to load all match data from the CSV file.
+RESULT: df is now a table with columns: team1, team2, toss_winner, match_winner, venue, etc.
+
+
+## STEP 1: Remove bad matches
+
+```python
+df = df[df['result'] == 'win'].copy()
+df = df.dropna(subset=['match_winner'])
+```
+
+WHAT:
+- First line: Keep only rows where result == 'win' (removes draws & unplayed matches)
+- Second line: Remove rows with missing match_winner values
+
+WHY: We want only matches with clear winners. Draws don't help us predict toss impact.
+
+
+## STEP 2: Add team names using mapping
+
+```python
+df['team1_name'] = df['team1'].map(TEAM_MAPPING)
+df['team2_name'] = df['team2'].map(TEAM_MAPPING)
+df['match_winner_name'] = df['match_winner'].map(TEAM_MAPPING)
+df['toss_winner_name'] = df['toss_winner'].map(TEAM_MAPPING)
+```
+
+WHAT: Creates new columns with team names
+HOW: .map(TEAM_MAPPING) looks up each ID and replaces it with the team name
+EXAMPLE: 
+- Before: team1 = 1, team2 = 2
+- After: team1_name = 'Royal Challengers Bangalore', team2_name = 'Mumbai Indians'
+
+WHY: Makes data readable. "Mumbai Indians" is better than "2"!
+
+
+## STEP 3: Consolidate teams (merge old IDs with new ones)
+
+```python
+for old_team_id, new_team_id in CONSOLIDATION_MAP.items():
+    if old_team_id != new_team_id:
+        if old_team_id not in [1414, 1419]:  # Dont consolidate disbanded teams
+            # Replace ALL occurrences of old_team_id with new_team_id
+            df.loc[df['team1'] == old_team_id, 'team1'] = new_team_id
+            df.loc[df['team2'] == old_team_id, 'team2'] = new_team_id
+            df.loc[df['match_winner'] == old_team_id, 'match_winner'] = new_team_id
+            df.loc[df['toss_winner'] == old_team_id, 'toss_winner'] = new_team_id
+```
+
+WHAT: Loop through CONSOLIDATION_MAP and replace old team IDs with new ones everywhere
+HOW: 
+1. For each (old_id, new_id) pair in the map
+2. Find all rows where team1 has old_id → replace with new_id
+3. Find all rows where team2 has old_id → replace with new_id
+4. Same for match_winner and toss_winner
+
+WHY: If we don't do this, the same team has split statistics
+EXAMPLE: Without consolidation:
+- Rajasthan Royals (ID 5) appears in 50 matches
+- Rajasthan Royals (ID 252) appears in 30 matches
+- Total looks like 80 matches but actually it's the same team!
+
+With consolidation: All 80 matches correctly show as ID 5
+
+
+## STEP 4: Get active teams (remove disbanded ones)
+
+```python
+active_teams = sorted([
+    t for t in set(df['team1'].unique()) | set(df['team2'].unique())
+    if t not in [1414, 1419]  # Exclude disbanded teams
+])
+
+# Remove disbanded teams from analysis
+df = df[~df['team1'].isin([1414, 1419]) & ~df['team2'].isin([1414, 1419])].copy()
+```
+
+WHAT: 
+- Get all unique team IDs from the data
+- Remove disbanded teams (1414 = Kochi, 1419 = Pune Warriors)
+
+WHY: Disbanded teams don't exist anymore. Their stats aren't relevant for current analysis.
+
+
+# ============================================================================
+# PART 4: CALCULATE TOSS VS MATCH WIN STATISTICS
+# ============================================================================
+
+## Function Purpose: For each team, calculate:
+- Total matches played
+- How many tosses they won
+- How many matches they won
+- **KEY STAT:** How many matches they won AFTER winning the toss
+- Percentage calculations for each
+
+```python
+toss_match_stats = {}
+
+for team_id in active_teams:
+    team_name = TEAM_MAPPING[team_id]
+    
+    # Step 1: Get all matches where this team participated
+    team_matches = df[(df['team1'] == team_id) | (df['team2'] == team_id)].copy()
+```
+
+WHAT: Get all matches where the team played (either as team1 OR team2)
+EXAMPLE: For Mumbai Indians (ID 2):
+- Find matches where team1 = 2
+- ALSO find matches where team2 = 2
+- Combine both results
+
+WHY: A team can be team1 OR team2 in the data. We need both.
+
+```python
+    # Step 2: Mark if team won toss
+    team_matches['team_won_toss'] = team_matches['toss_winner'] == team_id
+    
+    # Step 3: Mark if team won match
+    team_matches['team_won_match'] = team_matches['match_winner'] == team_id
+```
+
+WHAT: Create two new columns:
+- team_won_toss = True if this team won the toss, False otherwise
+- team_won_match = True if this team won the match, False otherwise
+
+WHY: Easier to count True/False values than to filter repeatedly
+
+```python
+    # Step 4: Count everything
+    total_matches = len(team_matches)
+    toss_wins = (team_matches['team_won_toss']).sum()
+    match_wins = (team_matches['team_won_match']).sum()
+    match_wins_after_toss_win = (team_matches['team_won_toss'] & team_matches['team_won_match']).sum()
+```
+
+WHAT: Calculate counts
+HOW:
+- .sum() on True/False column counts number of Trues
+- & operator means AND (both must be True)
+- So match_wins_after_toss_win = matches where BOTH toss_won AND match_won
+
+EXAMPLE OUTPUT:
+- total_matches = 150 (Mumbai Indians played 150 matches)
+- toss_wins = 80 (They won toss in 80 matches)
+- match_wins = 90 (They won matches in 90 out of 150)
+- match_wins_after_toss_win = 65 (After winning toss, they won 65 matches)
+
+```python
+    # Step 5: Calculate percentages
+    if toss_wins > 0:
+        win_pct_after_toss_win = (match_wins_after_toss_win / toss_wins) * 100
+    else:
+        win_pct_after_toss_win = 0
+
+    overall_win_pct = (match_wins / total_matches) * 100 if total_matches > 0 else 0
+```
+
+WHAT: Convert counts to percentages
+WHY: Percentages let us compare teams fairly
+EXAMPLE: 
+- win_pct_after_toss_win = (65 / 80) * 100 = 81.25%
+- overall_win_pct = (90 / 150) * 100 = 60%
+
+MEANING: When Mumbai Indians wins toss, they win the match 81.25% of the time!
+         Overall, they win 60% of their matches.
+
+```python
+    toss_match_stats[team_name] = {
+        'total_matches': total_matches,
+        'toss_wins': toss_wins,
+        'match_wins': match_wins,
+        'match_wins_after_toss_win': match_wins_after_toss_win,
+        'toss_win_pct': (toss_wins / total_matches * 100) if total_matches > 0 else 0,
+        'match_win_pct': overall_win_pct,
+        'win_pct_after_toss_win': win_pct_after_toss_win
+    }
+```
+
+WHAT: Store all statistics in a dictionary with team_name as key
+WHY: So we can later retrieve stats for any team by name
+
+
+# ============================================================================
+# PART 5: CALCULATE BATTING FIRST VS FIELDING FIRST STATISTICS
+# ============================================================================
+
+## Function Purpose: For each team, calculate:
+- How many times they batted first (chose to bat after winning toss)
+- How many times they fielded first (chose to field after winning toss)
+- Wins in each scenario
+
+```python
+bat_field_stats = {}
+
+for team_id in active_teams:
+    team_name = TEAM_MAPPING[team_id]
+    team_matches = df[(df['team1'] == team_id) | (df['team2'] == team_id)].copy()
+    
+    # Find matches where team won toss AND chose to bat
+    team_batted_after_win = team_matches[(team_matches['toss_winner'] == team_id) & 
+                                         (team_matches['toss_decision'] == 'bat')]
+    
+    # Find matches where team won toss AND chose to field
+    team_fielded_after_win = team_matches[(team_matches['toss_winner'] == team_id) & 
+                                          (team_matches['toss_decision'] == 'field')]
+```
+
+WHAT: Separate matches into two groups:
+- Matches where team won toss and CHOSE to bat
+- Matches where team won toss and CHOSE to field
+
+WHY: Teams have a preference! Some like to bat first, some like to field first.
+
+```python
+    # Count wins in each scenario
+    bat_first_wins = (team_batted_after_win['match_winner'] == team_id).sum()
+    field_first_wins = (team_fielded_after_win['match_winner'] == team_id).sum()
+    
+    bat_field_stats[team_name] = {
+        'bat_first_matches': len(team_batted_after_win),
+        'field_first_matches': len(team_fielded_after_win),
+        'bat_first_wins': bat_first_wins,
+        'field_first_wins': field_first_wins,
+        'bat_first_win_pct': (bat_first_wins / len(team_batted_after_win) * 100) if len(team_batted_after_win) > 0 else 0,
+        'field_first_win_pct': (field_first_wins / len(team_fielded_after_win) * 100) if len(team_fielded_after_win) > 0 else 0
+    }
+```
+
+WHAT: Calculate wins and percentages for batting first vs fielding first
+EXAMPLE OUTPUT for Mumbai Indians:
+- bat_first_matches: 50 → They chose to bat first 50 times after winning toss
+- field_first_matches: 30 → They chose to field first 30 times
+- bat_first_wins: 38 → After batting first, they won 38 matches
+- field_first_wins: 25 → After fielding first, they won 25 matches
+- bat_first_win_pct: 76% → When batting first (after toss win), they win 76% of matches
+- field_first_win_pct: 83% → When fielding first (after toss win), they win 83% of matches
+
+INSIGHT: This team performs BETTER when fielding first! Counter-intuitive!
+
+
+# ============================================================================
+# PART 6: FLASK WEB SERVER (app.py) - FUNCTIONS THAT PROVIDE DATA
+# ============================================================================
+
+The Flask app.py imports all statistics from applogic.py and creates web routes.
+
+## Function 1: get_team_list()
+
+```python
+def get_team_list():
+    """Returns list of all active team names"""
+    return sorted([TEAM_MAPPING[team_id] for team_id in active_teams])
+```
+
+WHAT: Returns a sorted list of all team names
+EXAMPLE OUTPUT: ['Chennai Super Kings', 'Delhi Capitals', 'Gujarat Titans', ...]
+
+WHY: Frontend dropdown needs this to show which teams are available for comparison
+
+
+## Function 2: analyze_toss_comparison(team1, team2, venue=None)
+
+```python
+def analyze_toss_comparison(team1, team2, venue=None):
+    # Filter matches where these two teams played against each other
+    matches = df[
+        ((df['team1_name'] == team1) & (df['team2_name'] == team2)) |
+        ((df['team1_name'] == team2) & (df['team2_name'] == team1))
+    ].copy()
+    
+    if venue:
+        matches = matches[matches['venue'] == venue]
+```
+
+WHAT: Find all matches between two teams (optionally at a specific venue)
+HOW: 
+- Filter where team1=A and team2=B OR team1=B and team2=A
+- If venue specified, filter by venue too
+
+WHY: We want to compare how each team performed in their head-to-head matches
+
+```python
+    # Count toss wins for each team
+    team1_toss_wins = (matches['toss_winner_name'] == team1).sum()
+    team2_toss_wins = (matches['toss_winner_name'] == team2).sum()
+    total_matches = len(matches)
+    
+    # Calculate percentages
+    team1_toss_pct = (team1_toss_wins / total_matches * 100) if total_matches > 0 else 0
+    team2_toss_pct = (team2_toss_wins / total_matches * 100) if total_matches > 0 else 0
+```
+
+WHAT: Count toss wins for each team and convert to percentages
+EXAMPLE: 
+- Mumbai Indians vs Rajasthan Royals played 10 times
+- Mumbai won toss 7 times (70%)
+- Rajasthan won toss 3 times (30%)
+
+```python
+    return {
+        'team1': team1,
+        'team2': team2,
+        'matches': total_matches,
+        'team1_toss_wins': team1_toss_wins,
+        'team2_toss_wins': team2_toss_wins,
+        'team1_toss_pct': round(team1_toss_pct, 2),
+        'team2_toss_pct': round(team2_toss_pct, 2),
+        'result': 'Mumbai Indians has HIGHER toss winning ratio'
+    }
+```
+
+WHAT: Return results as a dictionary (gets converted to JSON for browser)
+WHY: Browser receives this as JSON and displays it in the table
+
+
+## Function 3: analyze_match_comparison(team1, team2, venue=None)
+
+WHAT: Similar to above but COUNTS MATCH WINS instead of toss wins
+WHY: Shows which team actually wins more meetings, not just tosses
+EXAMPLE OUTPUT:
+- Mumbai won 6 matches vs Rajasthan
+- Rajasthan won 4 matches vs Mumbai
+
+
+## Function 4: get_team_summary(team_name)
+
+```python
+def get_team_summary(team_name):
+    return {
+        'team': team_name,
+        'total_matches': toss_match_stats[team_name]['total_matches'],
+        'toss_win_pct': toss_match_stats[team_name]['toss_win_pct'],
+        'match_win_pct': toss_match_stats[team_name]['match_win_pct'],
+        'win_pct_after_toss_win': toss_match_stats[team_name]['win_pct_after_toss_win'],
+        'bat_first_wins': bat_field_stats[team_name]['bat_first_wins'],
+        'field_first_wins': bat_field_stats[team_name]['field_first_wins'],
+    }
+```
+
+WHAT: Retrieves ALL statistics for one team
+WHY: Dashboard page needs complete stats for a single team
+
+
+## Function 5: get_venue_stats(team_name)
+
+WHAT: Shows how a team performs at EACH cricket ground
+HOW: Group matches by venue, calculate wins/matches at each venue
+RETURNS: {'Wankhede': {'matches': 20, 'wins': 15, 'win_pct': 75%}, ...}
+WHY: Shows if teams have home ground advantage
+
+
+# ============================================================================
+# PART 7: FLASK ROUTES (URLs where users visit)
+# ============================================================================
+
+## Route: GET /
+```python
+@app.route('/')
+def index():
+    return render_template('frontend.html')
+```
+
+WHAT: Home page
+WHERE: When user visits http://localhost:5000/, this page loads
+WHY: Shows the comparison form
+
+
+## Route: POST /api/compare
+
+```python
+@app.route('/api/compare', methods=['POST'])
+def compare():
+    team1 = request.json['team1']
+    team2 = request.json['team2']
+    venue = request.json.get('venue', 'all')
+    
+    toss_data = analyze_toss_comparison(team1, team2, venue if venue != 'all' else None)
+    match_data = analyze_match_comparison(team1, team2, venue if venue != 'all' else None)
+    
+    return jsonify({
+        'toss': toss_data,
+        'match': match_data
+    })
+```
+
+WHAT: Receives comparison request from frontend, returns comparison results
+HOW: 
+1. Get team1, team2, and venue from user input
+2. Call analyze_toss_comparison() to get toss stats
+3. Call analyze_match_comparison() to get match stats
+4. Return both as JSON
+
+EXAMPLE: User selects "Mumbai Indians" vs "Rajasthan Royals"
+Returns: {'toss': {...toss stats...}, 'match': {...match stats...}}
+
+
+## Route: GET /api/summary/{team_name}
+
+```python
+@app.route('/api/summary/<team_name>')
+def summary(team_name):
+    return jsonify(get_team_summary(team_name))
+```
+
+WHAT: Returns complete stats for one team
+HOW: Extract team_name from URL, call get_team_summary()
+EXAMPLE: /api/summary/Mumbai Indians
+Returns: {'team': 'Mumbai Indians', 'total_matches': 150, 'toss_win_pct': 53.3, ...}
+
+
+# ============================================================================
+# PART 8: FRONTEND (frontend.html) - WHAT USER SEES
+# ============================================================================
+
+## The HTML has:
+1. Form with two dropdown menus to select teams
+2. Buttons to trigger comparison
+3. JavaScript that:
+   - Calls /api/compare when user clicks "Compare"
+   - Receives JSON response
+   - Displays results in tables
+
+
+# ============================================================================
+# DATA FLOW (HOW IT ALL WORKS TOGETHER)
+# ============================================================================
+
+USER ACTIONS                     WHAT HAPPENS
+=============                    ============
+1. Visits website            →  Flask "/" route loads frontend.html
+
+2. Selects teams             →  Form shows list from get_team_list()
+
+3. Clicks "Compare"          →  JavaScript sends POST to /api/compare
+
+4. /api/compare called       →  Calls analyze_toss_comparison()
+                                Calls analyze_match_comparison()
+                                Returns JSON
+
+5. Browser receives JSON     →  JavaScript displays results in table
+
+6. User clicks team name     →  /api/summary/{team_name} fetches stats
+                                Shows team dashboard
+
+
+# ============================================================================
+# KEY PYTHON CONCEPTS EXPLAINED
+# ============================================================================
+
+CONCEPT: DataFrame (df)
+MEANING: A table with rows and columns, like an Excel spreadsheet
+EXAMPLE: df has columns [team1, team2, toss_winner, match_winner, venue]
+         Each row is one IPL match
+
+CONCEPT: .map(dictionary)
+MEANING: Replace each value using a dictionary lookup
+EXAMPLE: df['team1'].map(TEAM_MAPPING) converts all team IDs to names
+
+CONCEPT: .sum() on True/False
+MEANING: Counts number of True values (True=1, False=0)
+EXAMPLE: (df['result'] == 'win').sum() counts how many matches had "win" result
+
+CONCEPT: & operator (AND)
+MEANING: Both conditions must be True
+EXAMPLE: (toss_won & match_won) = True only if BOTH toss was won AND match was won
+
+CONCEPT: | operator (OR)
+MEANING: Either condition can be True
+EXAMPLE: (team1 == id) | (team2 == id) = True if the team is either team1 or team2
+
+CONCEPT: .copy()
+MEANING: Makes a copy of data so edits don't affect original
+EXAMPLE: df.copy() creates a new independent copy of dataframe
+
+CONCEPT: JSON
+MEANING: A format for sending data from server to browser
+EXAMPLE: {'team': 'Mumbai', 'wins': 50} gets converted to JSON
+
+
+# ============================================================================
+# HOW TO RUN (STEP BY STEP)
+# ============================================================================
+
+STEP 1: Get the data file
+        - Get ipl_matches_data.csv
+        - Place it in project root folder
+
+STEP 2: Run applogic.py (calculates all statistics)
+        Open terminal, run: python backend/applogic.py
+        This creates all the statistics in memory
+
+STEP 3: Run Flask server
+        Open terminal, run: python flask/app.py
+        This starts the web server
+
+STEP 4: Visit the website
+        Open browser
+        Go to: http://localhost:5000
+        You should see the comparison form
+
+STEP 5: Use the app!
+        - Select two teams
+        - Click "Compare"
+        - See toss and match comparison results
+
+
+# ============================================================================
+# WHAT EACH FILE IS FOR
+# ============================================================================
+
+FILE: ipl_matches_data.csv
+PURPOSE: Raw data - all IPL match records
+COLUMNS: team1, team2, toss_winner, toss_decision, match_winner, venue, season, result
+
+FILE: backend/applogic.py
+PURPOSE: Analyzes the CSV data
+OUTPUT: Creates dictionaries (toss_match_stats, bat_field_stats, venue_stats)
+        These get imported by app.py
+
+FILE: flask/app.py
+PURPOSE: Web server that provides API routes
+INPUT: Data from applogic.py
+OUTPUT: JSON responses that frontend receives
+
+FILE: templates/frontend.html
+PURPOSE: User interface (what people see in browser)
+INPUT: JSON from app.py API routes
+OUTPUT: Displays comparison results and team stats
+
+---
+End of explanation. Good luck understanding the code!
+# ============================================================================
+# IPL TOSS PREDICTOR & ANALYSIS - COMPLETE CODE EXPLANATION
+# ============================================================================
+# This document explains EVERY function and why it was used.
+# Read this to understand what the code does and how to use it.
+# ============================================================================
+
+
+# ============================================================================
+# PART 1: IMPORTS AND SETUP
+# ============================================================================
+
+## What it does:
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from collections import defaultdict
+import warnings
+warnings.filterwarnings('ignore')
+```
+
+**pandas (pd):** Tool for handling data tables (like Excel files)
+**numpy (np):** Tool for math calculations on arrays
+**matplotlib.pyplot (plt):** Tool for creating charts and graphs
+**seaborn (sns):** Makes prettier charts on top of matplotlib
+**defaultdict:** Special dictionary that auto-creates values for new keys
+**warnings.filterwarnings('ignore'):** Hide warning messages that clutter output
+
+WHY: These libraries make data analysis and visualization possible. Without them, we'd code everything manually (very hard!).
+
+
+# ============================================================================
+# PART 2: TEAM MAPPING AND CONSOLIDATION SETUP
+# ============================================================================
+
+## What this does:
+Creates lookup tables to convert team IDs (numbers) → team names (text)
+
+```python
+TEAM_MAPPING = {
+    1: 'Royal Challengers Bangalore',
+    2: 'Mumbai Indians',
+    3: 'Kolkata Knight Riders',
+    # ... and so on
+    614: 'Gujarat Titans',
+    615: 'Lucknow Super Giants',
+}
+```
+
+WHY: The CSV file has team IDs (like 1, 2, 3) but we want to show real team names to users.
+
+---
+
+```python
+CONSOLIDATION_MAP = {
+    252: 5,    # Old ID 252 → merge into ID 5 (Rajasthan Royals)
+    494: 129,  # Old ID 494 → merge into ID 129 (Sunrisers Hyderabad)
+}
+```
+
+WHY: Some teams changed names over the years or had multiple IDs. We consolidate them so the same team is counted in statistics only once.
+
+---
+
+```python
+NEWLY_ADDED_TEAMS = {614, 615}  # Gujarat Titans, Lucknow Super Giants
+```
+
+WHY: These teams were added in 2022. They handle them separately so their stats aren't mixed with older teams.
+
+
+# ============================================================================
+# PART 3: DATA LOADING AND CLEANING
+# ============================================================================
+
+## What it does:
+Loads the CSV file, removes bad data, and prepares it for analysis.
+
+```python
+df = pd.read_csv('ipl_matches_data.csv')
 print("=" * 80)
 print("STEP 1: LOADING AND CLEANING DATA")
 print("=" * 80)
