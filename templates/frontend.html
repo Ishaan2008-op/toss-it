@@ -2,614 +2,617 @@
 <html lang="en">
 
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>IPL TOSS ANALYSER AND STATS</title>
- <style>
-  :root {
-   --primary: #1e3799;
-   --primary-light: #4a69bd;
-   --accent: #f6b93b;
-   --bg: #f8faff;
-   --surface: #ffffff;
-   --text-main: #0c2461;
-   --text-muted: #60a3bc;
-   --radius: 16px;
-   --shadow: 20px 20px 60px #d9dee3, -20px -20px 60px #ffffff;
-   --shadow-sm: 6px 6px 12px #d9dee3, -6px -6px 12px #ffffff;
-   --shadow-inset: inset 4px 4px 8px #d9dee3, inset -4px -4px 8px #ffffff;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPL TOSS ANALYSER AND STATS</title>
+  <style>
+    :root {
+      --primary: #1e3799;
+      --primary-light: #4a69bd;
+      --accent: #f6b93b;
+      --bg: #f8faff;
+      --surface: #ffffff;
+      --text-main: #0c2461;
+      --text-muted: #60a3bc;
+      --radius: 16px;
+      --shadow: 20px 20px 60px #d9dee3, -20px -20px 60px #ffffff;
+      --shadow-sm: 6px 6px 12px #d9dee3, -6px -6px 12px #ffffff;
+      --shadow-inset: inset 4px 4px 8px #d9dee3, inset -4px -4px 8px #ffffff;
+    }
 
-  * {
-   margin: 0;
-   padding: 0;
-   box-sizing: border-box;
-  }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  body {
-   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-   background-color: var(--bg);
-   color: var(--text-main);
-   min-height: 100vh;
-   padding: 40px 20px;
-   line-height: 1.5;
-  }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 40px 20px;
+      line-height: 1.5;
+    }
 
-  .container {
-   max-width: 1000px;
-   margin: 0 auto;
-   padding: 20px;
-  }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
 
-  header {
-   text-align: center;
-   margin-bottom: 60px;
-  }
+    header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
 
-  h1 {
-   font-size: 3rem;
-   font-weight: 800;
-   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-   background-clip: text;
-   -webkit-background-clip: text;
-   -webkit-text-fill-color: transparent;
-   letter-spacing: -1px;
-   margin-bottom: 10px;
-  }
+    h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+      margin-bottom: 10px;
+    }
 
-  .subtitle {
-   color: var(--text-muted);
-   font-size: 1.1rem;
-   font-weight: 500;
-  }
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
 
-  .dashboard-grid {
-   display: grid;
-   grid-template-columns: 1.5fr 1fr;
-   gap: 40px;
-  }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 40px;
+    }
 
-  @media (max-width: 900px) {
-   .dashboard-grid {
-    grid-template-columns: 1fr;
-   }
-  }
+    @media (max-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
 
-  .card {
-   background: var(--surface);
-   border-radius: var(--radius);
-   padding: 32px;
-   box-shadow: var(--shadow);
-   border: 1px solid rgba(255, 255, 255, 0.8);
-   margin-bottom: 40px;
-  }
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      margin-bottom: 40px;
+    }
 
-  .section-title {
-   font-size: 1.25rem;
-   font-weight: 700;
-   margin-bottom: 24px;
-   display: flex;
-   align-items: center;
-   gap: 12px;
-   color: var(--primary);
-  }
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--primary);
+    }
 
-  .form-group {
-   margin-bottom: 24px;
-  }
+    .form-group {
+      margin-bottom: 24px;
+    }
 
-  .input-grid {
-   display: grid;
-   grid-template-columns: 1fr 1fr;
-   gap: 20px;
-   margin-bottom: 20px;
-  }
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
 
-  label {
-   display: block;
-   font-size: 0.8rem;
-   font-weight: 700;
-   text-transform: uppercase;
-   letter-spacing: 1px;
-   margin-bottom: 8px;
-   color: var(--text-muted);
-  }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+    }
 
-  select {
-   width: 100%;
-   padding: 14px;
-   border: none;
-   border-radius: 12px;
-   background: var(--bg);
-   box-shadow: var(--shadow-inset);
-   font-family: inherit;
-   font-size: 0.95rem;
-   color: var(--text-main);
-   cursor: pointer;
-   transition: all 0.2s ease;
-  }
+    select {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: var(--bg);
+      box-shadow: var(--shadow-inset);
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
 
-  select:focus {
-   outline: 2px solid var(--primary-light);
-  }
+    select:focus {
+      outline: 2px solid var(--primary-light);
+    }
 
-  .btn {
-   width: 100%;
-   padding: 16px;
-   border: none;
-   border-radius: 12px;
-   background: var(--primary);
-   color: white;
-   font-weight: 700;
-   font-size: 1rem;
-   cursor: pointer;
-   transition: all 0.3s ease;
-   box-shadow: 0 10px 20px rgba(30, 55, 153, 0.2);
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   gap: 10px;
-  }
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 20px rgba(30, 55, 153, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
 
-  .btn:hover {
-   background: var(--primary-light);
-   transform: translateY(-2px);
-   box-shadow: 0 15px 30px rgba(30, 55, 153, 0.3);
-  }
+    .btn:hover {
+      background: var(--primary-light);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(30, 55, 153, 0.3);
+    }
 
-  .info-box {
-   background: #ebf3ff;
-   border-radius: var(--radius);
-   padding: 24px;
-   margin-top: 20px;
-  }
+    .info-box {
+      background: #ebf3ff;
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-top: 20px;
+    }
 
-  .info-box h3 {
-   font-size: 1rem;
-   margin-bottom: 12px;
-   color: var(--primary);
-  }
+    .info-box h3 {
+      font-size: 1rem;
+      margin-bottom: 12px;
+      color: var(--primary);
+    }
 
-  .info-box p {
-   font-size: 0.9rem;
-   margin-bottom: 10px;
-   color: var(--text-main);
-  }
+    .info-box p {
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+      color: var(--text-main);
+    }
 
-  .spacer {
-   height: 20px;
-  }
+    .spacer {
+      height: 20px;
+    }
 
-  .results-section {
-   margin-top: 40px;
-   padding: 32px;
-   background: var(--surface);
-   border-radius: var(--radius);
-   box-shadow: var(--shadow);
-   border: 1px solid rgba(255, 255, 255, 0.8);
-   display: none;
-  }
+    .results-section {
+      margin-top: 40px;
+      padding: 32px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      display: none;
+    }
 
-  .results-section.show {
-   display: block;
-   animation: slideIn 0.5s ease;
-  }
+    .results-section.show {
+      display: block;
+      animation: slideIn 0.5s ease;
+    }
 
-  @keyframes slideIn {
-   from {
-    opacity: 0;
-    transform: translateY(20px);
-   }
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
 
-   to {
-    opacity: 1;
-    transform: translateY(0);
-   }
-  }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-  .result-card {
-   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-   padding: 20px;
-   border-radius: 12px;
-   margin-bottom: 20px;
-   border-left: 4px solid var(--primary);
-  }
+    .result-card {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary);
+    }
 
-  .result-card h4 {
-   color: var(--primary);
-   font-size: 1.1rem;
-   margin-bottom: 10px;
-  }
+    .result-card h4 {
+      color: var(--primary);
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
 
-  .result-card p {
-   color: var(--text-main);
-   margin: 5px 0;
-   font-weight: 500;
-  }
+    .result-card p {
+      color: var(--text-main);
+      margin: 5px 0;
+      font-weight: 500;
+    }
 
-  .result-value {
-   font-size: 1.3rem;
-   font-weight: bold;
-   color: var(--primary-light);
-  }
+    .result-value {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--primary-light);
+    }
 
-  .visualization {
-   text-align: center;
-   margin: 30px 0;
-  }
+    .visualization {
+      text-align: center;
+      margin: 30px 0;
+    }
 
-  .visualization img {
-   max-width: 100%;
-   height: auto;
-   border-radius: 12px;
-   box-shadow: var(--shadow-sm);
-  }
+    .visualization img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+    }
 
-  .stats-grid {
-   display: grid;
-   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-   gap: 20px;
-   margin-top: 20px;
-  }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
 
-  .stat-box {
-   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-   padding: 20px;
-   border-radius: 12px;
-   color: white;
-   text-align: center;
-  }
+    .stat-box {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      border-radius: 12px;
+      color: white;
+      text-align: center;
+    }
 
-  .stat-box.alt {
-   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  }
+    .stat-box.alt {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
 
-  .stat-box h5 {
-   font-size: 0.9rem;
-   margin-bottom: 10px;
-   opacity: 0.9;
-  }
+    .stat-box h5 {
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
 
-  .stat-box .big-number {
-   font-size: 2rem;
-   font-weight: bold;
-  }
+    .stat-box .big-number {
+      font-size: 2rem;
+      font-weight: bold;
+    }
 
-  .error-message {
-   background: #fee;
-   color: #c33;
-   padding: 16px;
-   border-radius: 8px;
-   border-left: 4px solid #c33;
-   margin-bottom: 20px;
-  }
+    .error-message {
+      background: #fee;
+      color: #c33;
+      padding: 16px;
+      border-radius: 8px;
+      border-left: 4px solid #c33;
+      margin-bottom: 20px;
+    }
 
-  .loading {
-   text-align: center;
-   padding: 20px;
-   color: var(--text-muted);
-  }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-muted);
+    }
 
-  .spinner {
-   border: 4px solid var(--bg);
-   border-top: 4px solid var(--primary);
-   border-radius: 50%;
-   width: 40px;
-   height: 40px;
-   animation: spin 1s linear infinite;
-   margin: 20px auto;
-  }
+    .spinner {
+      border: 4px solid var(--bg);
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
 
-  @keyframes spin {
-   0% {
-    transform: rotate(0deg);
-   }
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
 
-   100% {
-    transform: rotate(360deg);
-   }
-  }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
 
-  .btn-accent {
-   background: linear-gradient(135deg, var(--accent) 0%, #f5af19 100%);
-  }
+    .btn-accent {
+      background: linear-gradient(135deg, var(--accent) 0%, #f5af19 100%);
+    }
 
-  .btn-accent:hover {
-   background: linear-gradient(135deg, #f5af19 0%, var(--accent) 100%);
-  }
+    .btn-accent:hover {
+      background: linear-gradient(135deg, #f5af19 0%, var(--accent) 100%);
+    }
 
-  .btn:disabled {
-   opacity: 0.6;
-   cursor: not-allowed;
-  }
- </style>
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
 
 <body>
- <div class="container">
-  <header>
-   <h1>IPL Toss Analyser</h1>
-   <p class="subtitle">Data-driven win probability and venue statistics</p>
-  </header>
+  <div class="container">
+    <header>
+      <h1>IPL Toss Analyser</h1>
+      <p class="subtitle">Data-driven win probability and venue statistics</p>
+    </header>
 
-  <div class="dashboard-grid">
-   <div class="main-col">
-    <div class="card">
-     <h2 class="section-title">⚔️ Outcome Analysis</h2>
-     <form id="analysisForm">
-      <div class="form-group">
-       <label>Venue (Optional)</label>
-       <select id="venueSelect" name="venue">
-        <option value="">No venue filter (Compare globally)</option>
-        <option value="Arun Jaitley Stadium">Arun Jaitley Stadium</option>
-        <option value="Eden Gardens">Eden Gardens</option>
-        <option value="Wankhede Stadium">Wankhede Stadium</option>
-        <option value="M Chinnaswamy Stadium">M Chinnaswamy Stadium</option>
-        <option value="MA Chidambaram Stadium">MA Chidambaram Stadium</option>
-        <option value="Sawai Mansingh Stadium">Sawai Mansingh Stadium</option>
-        <option value="Punjab Cricket Association IS Bindra Stadium">Punjab Cricket Association IS Bindra Stadium
-        </option>
-        <option value="Arun Jaitley Stadium, Delhi">Arun Jaitley Stadium, Delhi</option>
-        <option value="Barabati Stadium">Barabati Stadium</option>
-        <option value="Barsapara Cricket Stadium, Guwahati">Barsapara Cricket Stadium, Guwahati</option>
-        <option value="Brabourne Stadium">Brabourne Stadium</option>
-        <option value="Brabourne Stadium, Mumbai">Brabourne Stadium, Mumbai</option>
-        <option value="Buffalo Park">Buffalo Park</option>
-        <option value="De Beers Diamond Oval">De Beers Diamond Oval</option>
-        <option value="Dr DY Patil Sports Academy">Dr DY Patil Sports Academy</option>
-        <option value="Dr DY Patil Sports Academy, Mumbai">Dr DY Patil Sports Academy, Mumbai</option>
-        <option value="Dubai International Cricket Stadium">Dubai International Cricket Stadium</option>
-        <option value="Eden Gardens, Kolkata">Eden Gardens, Kolkata</option>
-        <option value="Feroz Shah Kotla">Feroz Shah Kotla</option>
-        <option value="Green Park">Green Park</option>
-        <option value="Himachal Pradesh Cricket Association Stadium">Himachal Pradesh Cricket Association Stadium
-        </option>
-        <option value="Holkar Cricket Stadium">Holkar Cricket Stadium</option>
-        <option value="JSCA International Stadium Complex">JSCA International Stadium Complex</option>
-        <option value="Kingsmead">Kingsmead</option>
-        <option value="M.Chinnaswamy Stadium">M.Chinnaswamy Stadium</option>
-        <option value="MA Chidambaram Stadium, Chepauk">MA Chidambaram Stadium, Chepauk</option>
-        <option value="Maharashtra Cricket Association Stadium">Maharashtra Cricket Association Stadium</option>
-        <option value="Narendra Modi Stadium, Ahmedabad">Narendra Modi Stadium, Ahmedabad</option>
-        <option value="Nehru Stadium">Nehru Stadium</option>
-        <option value="New Wanderers Stadium">New Wanderers Stadium</option>
-        <option value="Newlands">Newlands</option>
-        <option value="OUTsurance Oval">OUTsurance Oval</option>
-        <option value="Rajiv Gandhi International Stadium">Rajiv Gandhi International Stadium</option>
-        <option value="Sardar Patel Stadium, Motera">Sardar Patel Stadium, Motera</option>
-        <option value="Saurashtra Cricket Association Stadium">Saurashtra Cricket Association Stadium</option>
-        <option value="Sawai Mansingh Stadium, Jaipur">Sawai Mansingh Stadium, Jaipur</option>
-        <option value="Sharjah Cricket Stadium">Sharjah Cricket Stadium</option>
-        <option value="Sheikh Zayed Stadium">Sheikh Zayed Stadium</option>
-        <option value="Wankhede Stadium, Mumbai">Wankhede Stadium, Mumbai</option>
-       </select>
+    <div class="dashboard-grid">
+      <div class="main-col">
+        <div class="card">
+          <h2 class="section-title">⚔️ Outcome Analysis</h2>
+          <form id="analysisForm">
+            <div class="form-group">
+              <label>Venue (Optional)</label>
+              <select id="venueSelect" name="venue">
+                <option value="">No venue filter (Compare globally)</option>
+                <option value="Arun Jaitley Stadium">Arun Jaitley Stadium</option>
+                <option value="Eden Gardens">Eden Gardens</option>
+                <option value="Wankhede Stadium">Wankhede Stadium</option>
+                <option value="M Chinnaswamy Stadium">M Chinnaswamy Stadium</option>
+                <option value="MA Chidambaram Stadium">MA Chidambaram Stadium</option>
+                <option value="Sawai Mansingh Stadium">Sawai Mansingh Stadium</option>
+                <option value="Punjab Cricket Association IS Bindra Stadium">Punjab Cricket Association IS Bindra
+                  Stadium
+                </option>
+                <option value="Arun Jaitley Stadium, Delhi">Arun Jaitley Stadium, Delhi</option>
+                <option value="Barabati Stadium">Barabati Stadium</option>
+                <option value="Barsapara Cricket Stadium, Guwahati">Barsapara Cricket Stadium, Guwahati</option>
+                <option value="Brabourne Stadium">Brabourne Stadium</option>
+                <option value="Brabourne Stadium, Mumbai">Brabourne Stadium, Mumbai</option>
+                <option value="Buffalo Park">Buffalo Park</option>
+                <option value="De Beers Diamond Oval">De Beers Diamond Oval</option>
+                <option value="Dr DY Patil Sports Academy">Dr DY Patil Sports Academy</option>
+                <option value="Dr DY Patil Sports Academy, Mumbai">Dr DY Patil Sports Academy, Mumbai</option>
+                <option value="Dubai International Cricket Stadium">Dubai International Cricket Stadium</option>
+                <option value="Eden Gardens, Kolkata">Eden Gardens, Kolkata</option>
+                <option value="Feroz Shah Kotla">Feroz Shah Kotla</option>
+                <option value="Green Park">Green Park</option>
+                <option value="Himachal Pradesh Cricket Association Stadium">Himachal Pradesh Cricket Association
+                  Stadium
+                </option>
+                <option value="Holkar Cricket Stadium">Holkar Cricket Stadium</option>
+                <option value="JSCA International Stadium Complex">JSCA International Stadium Complex</option>
+                <option value="Kingsmead">Kingsmead</option>
+                <option value="M.Chinnaswamy Stadium">M.Chinnaswamy Stadium</option>
+                <option value="MA Chidambaram Stadium, Chepauk">MA Chidambaram Stadium, Chepauk</option>
+                <option value="Maharashtra Cricket Association Stadium">Maharashtra Cricket Association Stadium</option>
+                <option value="Narendra Modi Stadium, Ahmedabad">Narendra Modi Stadium, Ahmedabad</option>
+                <option value="Nehru Stadium">Nehru Stadium</option>
+                <option value="New Wanderers Stadium">New Wanderers Stadium</option>
+                <option value="Newlands">Newlands</option>
+                <option value="OUTsurance Oval">OUTsurance Oval</option>
+                <option value="Rajiv Gandhi International Stadium">Rajiv Gandhi International Stadium</option>
+                <option value="Sardar Patel Stadium, Motera">Sardar Patel Stadium, Motera</option>
+                <option value="Saurashtra Cricket Association Stadium">Saurashtra Cricket Association Stadium</option>
+                <option value="Sawai Mansingh Stadium, Jaipur">Sawai Mansingh Stadium, Jaipur</option>
+                <option value="Sharjah Cricket Stadium">Sharjah Cricket Stadium</option>
+                <option value="Sheikh Zayed Stadium">Sheikh Zayed Stadium</option>
+                <option value="Wankhede Stadium, Mumbai">Wankhede Stadium, Mumbai</option>
+              </select>
+            </div>
+            <div class="input-grid">
+              <div class="form-group">
+                <label>Team 1</label>
+                <select id="team1Select" name="team1" required>
+                  <option value="">-- Select --</option>
+                  <option value="Royal Challengers Bangalore">Royal Challengers Bangalore</option>
+                  <option value="Mumbai Indians">Mumbai Indians</option>
+                  <option value="Kolkata Knight Riders">Kolkata Knight Riders</option>
+                  <option value="Delhi Capitals">Delhi Capitals</option>
+                  <option value="Rajasthan Royals">Rajasthan Royals</option>
+                  <option value="Punjab Kings">Punjab Kings</option>
+                  <option value="Sunrisers Hyderabad">Sunrisers Hyderabad</option>
+                  <option value="Chennai Super Kings">Chennai Super Kings</option>
+                  <option value="Gujarat Titans">Gujarat Titans</option>
+                  <option value="Lucknow Super Giants">Lucknow Super Giants</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Team 2</label>
+                <select id="team2Select" name="team2" required>
+                  <option value="">-- Select --</option>
+                  <option value="Royal Challengers Bangalore">Royal Challengers Bangalore</option>
+                  <option value="Mumbai Indians">Mumbai Indians</option>
+                  <option value="Kolkata Knight Riders">Kolkata Knight Riders</option>
+                  <option value="Delhi Capitals">Delhi Capitals</option>
+                  <option value="Rajasthan Royals">Rajasthan Royals</option>
+                  <option value="Punjab Kings">Punjab Kings</option>
+                  <option value="Sunrisers Hyderabad">Sunrisers Hyderabad</option>
+                  <option value="Chennai Super Kings">Chennai Super Kings</option>
+                  <option value="Gujarat Titans">Gujarat Titans</option>
+                  <option value="Lucknow Super Giants">Lucknow Super Giants</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn" id="analyzeBtn">📊 Analyse Winning Probability</button>
+          </form>
+        </div>
+
+        <!-- RESULTS SECTION FOR OUTCOME ANALYSIS -->
+        <div id="analysisResults" class="results-section">
+          <h2 class="section-title">📈 Analysis Results</h2>
+          <div id="analysisContent"></div>
+        </div>
       </div>
-      <div class="input-grid">
-       <div class="form-group">
-        <label>Team 1</label>
-        <select id="team1Select" name="team1" required>
-         <option value="">-- Select --</option>
-         <option value="Royal Challengers Bangalore">Royal Challengers Bangalore</option>
-         <option value="Mumbai Indians">Mumbai Indians</option>
-         <option value="Kolkata Knight Riders">Kolkata Knight Riders</option>
-         <option value="Delhi Capitals">Delhi Capitals</option>
-         <option value="Rajasthan Royals">Rajasthan Royals</option>
-         <option value="Punjab Kings">Punjab Kings</option>
-         <option value="Sunrisers Hyderabad">Sunrisers Hyderabad</option>
-         <option value="Chennai Super Kings">Chennai Super Kings</option>
-         <option value="Gujarat Titans">Gujarat Titans</option>
-         <option value="Lucknow Super Giants">Lucknow Super Giants</option>
-        </select>
-       </div>
-       <div class="form-group">
-        <label>Team 2</label>
-        <select id="team2Select" name="team2" required>
-         <option value="">-- Select --</option>
-         <option value="Royal Challengers Bangalore">Royal Challengers Bangalore</option>
-         <option value="Mumbai Indians">Mumbai Indians</option>
-         <option value="Kolkata Knight Riders">Kolkata Knight Riders</option>
-         <option value="Delhi Capitals">Delhi Capitals</option>
-         <option value="Rajasthan Royals">Rajasthan Royals</option>
-         <option value="Punjab Kings">Punjab Kings</option>
-         <option value="Sunrisers Hyderabad">Sunrisers Hyderabad</option>
-         <option value="Chennai Super Kings">Chennai Super Kings</option>
-         <option value="Gujarat Titans">Gujarat Titans</option>
-         <option value="Lucknow Super Giants">Lucknow Super Giants</option>
-        </select>
-       </div>
+
+      <div class="side-col">
+        <div class="card">
+          <h2 class="section-title">📊 Quick Stats</h2>
+          <form id="statsForm">
+            <div class="form-group">
+              <label>Select Team</label>
+              <select id="teamSelect" name="team" required>
+                <option value="">Select an IPL Team</option>
+                <option value="Royal Challengers Bangalore">Royal Challengers Bangalore</option>
+                <option value="Mumbai Indians">Mumbai Indians</option>
+                <option value="Kolkata Knight Riders">Kolkata Knight Riders</option>
+                <option value="Delhi Capitals">Delhi Capitals</option>
+                <option value="Rajasthan Royals">Rajasthan Royals</option>
+                <option value="Punjab Kings">Punjab Kings</option>
+                <option value="Sunrisers Hyderabad">Sunrisers Hyderabad</option>
+                <option value="Chennai Super Kings">Chennai Super Kings</option>
+                <option value="Gujarat Titans">Gujarat Titans</option>
+                <option value="Lucknow Super Giants">Lucknow Super Giants</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-accent" id="statsBtn">📖 View Historical Stats</button>
+            <button type="button" class="btn btn-accent" id="heatmapBtn" style="margin-top: 12px;">🔥 View Venue
+              Heatmap</button>
+          </form>
+
+          <!-- RESULTS SECTION FOR QUICK STATS -->
+          <div id="statsResults" class="results-section">
+            <h3>Team Performance Statistics</h3>
+            <div id="statsContent"></div>
+          </div>
+
+          <!-- INFO BOX -->
+          <div class="info-box">
+            <h3>📘 How to Use</h3>
+            <p><strong>Outcome Analysis:</strong> Compare two teams' toss and match win rates. Optionally filter by
+              venue.</p>
+            <p><strong>Quick Stats:</strong> View comprehensive statistics for any single team.</p>
+            <p><strong>Venue Heatmap:</strong> See how a team performs at different venues (Red=Low%, Green=High%).</p>
+            <p style="font-size: 0.8rem; margin-top: 15px; color: #666;">Data: 2008-2025 IPL Seasons</p>
+          </div>
+        </div>
       </div>
-      <button type="submit" class="btn" id="analyzeBtn">📊 Analyse Winning Probability</button>
-     </form>
     </div>
-
-    <!-- RESULTS SECTION FOR OUTCOME ANALYSIS -->
-    <div id="analysisResults" class="results-section">
-     <h2 class="section-title">📈 Analysis Results</h2>
-     <div id="analysisContent"></div>
-    </div>
-   </div>
-
-   <div class="side-col">
-    <div class="card">
-     <h2 class="section-title">📊 Quick Stats</h2>
-     <form id="statsForm">
-      <div class="form-group">
-       <label>Select Team</label>
-       <select id="teamSelect" name="team" required>
-        <option value="">Select an IPL Team</option>
-        <option value="Royal Challengers Bangalore">Royal Challengers Bangalore</option>
-        <option value="Mumbai Indians">Mumbai Indians</option>
-        <option value="Kolkata Knight Riders">Kolkata Knight Riders</option>
-        <option value="Delhi Capitals">Delhi Capitals</option>
-        <option value="Rajasthan Royals">Rajasthan Royals</option>
-        <option value="Punjab Kings">Punjab Kings</option>
-        <option value="Sunrisers Hyderabad">Sunrisers Hyderabad</option>
-        <option value="Chennai Super Kings">Chennai Super Kings</option>
-        <option value="Gujarat Titans">Gujarat Titans</option>
-        <option value="Lucknow Super Giants">Lucknow Super Giants</option>
-       </select>
-      </div>
-      <button type="submit" class="btn btn-accent" id="statsBtn">📖 View Historical Stats</button>
-      <button type="button" class="btn btn-accent" id="heatmapBtn" style="margin-top: 12px;">🔥 View Venue
-       Heatmap</button>
-     </form>
-
-     <!-- RESULTS SECTION FOR QUICK STATS -->
-     <div id="statsResults" class="results-section">
-      <h3>Team Performance Statistics</h3>
-      <div id="statsContent"></div>
-     </div>
-
-     <!-- INFO BOX -->
-     <div class="info-box">
-      <h3>📘 How to Use</h3>
-      <p><strong>Outcome Analysis:</strong> Compare two teams' toss and match win rates. Optionally filter by venue.</p>
-      <p><strong>Quick Stats:</strong> View comprehensive statistics for any single team.</p>
-      <p><strong>Venue Heatmap:</strong> See how a team performs at different venues (Red=Low%, Green=High%).</p>
-      <p style="font-size: 0.8rem; margin-top: 15px; color: #666;">Data: 2008-2025 IPL Seasons</p>
-     </div>
-    </div>
-   </div>
   </div>
- </div>
 
- <!-- JAVASCRIPT: This handles all the form submissions and API calls -->
- <script>
-  // Prevent form submission and handle via AJAX instead
-  document.getElementById('analysisForm').addEventListener('submit', async (e) => {
-   e.preventDefault();
+  <!-- JAVASCRIPT: This handles all the form submissions and API calls -->
+  <script>
+    // Prevent form submission and handle via AJAX instead
+    document.getElementById('analysisForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-   // GET FORM VALUES
-   const team1 = document.getElementById('team1Select').value;
-   const team2 = document.getElementById('team2Select').value;
-   const venue = document.getElementById('venueSelect').value;
+      // GET FORM VALUES
+      const team1 = document.getElementById('team1Select').value;
+      const team2 = document.getElementById('team2Select').value;
+      const venue = document.getElementById('venueSelect').value;
 
-   // VALIDATION: Make sure both teams are selected and they're different
-   if (!team1 || !team2) {
-    showError('analysisResults', 'Please select both teams');
-    return;
-   }
+      // VALIDATION: Make sure both teams are selected and they're different
+      if (!team1 || !team2) {
+        showError('analysisResults', 'Please select both teams');
+        return;
+      }
 
-   if (team1 === team2) {
-    showError('analysisResults', 'Please select different teams');
-    return;
-   }
+      if (team1 === team2) {
+        showError('analysisResults', 'Please select different teams');
+        return;
+      }
 
-   // SHOW LOADING STATE
-   const resultsDiv = document.getElementById('analysisResults');
-   resultsDiv.classList.add('show');
-   document.getElementById('analysisContent').innerHTML = '<div class="loading"><div class="spinner"></div>Loading analysis...</div>';
+      // SHOW LOADING STATE
+      const resultsDiv = document.getElementById('analysisResults');
+      resultsDiv.classList.add('show');
+      document.getElementById('analysisContent').innerHTML = '<div class="loading"><div class="spinner"></div>Loading analysis...</div>';
 
-   try {
-    // SEND REQUEST TO FLASK BACKEND
-    const formData = new FormData();
-    formData.append('team1', team1);
-    formData.append('team2', team2);
-    formData.append('venue', venue);
+      try {
+        // SEND REQUEST TO FLASK BACKEND
+        const formData = new FormData();
+        formData.append('team1', team1);
+        formData.append('team2', team2);
+        formData.append('venue', venue);
 
-    const response = await fetch('/analyze', {
-     method: 'POST',
-     body: formData
+        const response = await fetch('/analyze', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+          showError('analysisResults', data.error || 'An error occurred');
+          return;
+        }
+
+        // DISPLAY RESULTS
+        displayAnalysisResults(data);
+      } catch (error) {
+        showError('analysisResults', `Error: ${error.message}`);
+      }
     });
 
-    const data = await response.json();
+    // STATS FORM SUBMISSION
+    document.getElementById('statsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-    if (!response.ok || data.error) {
-     showError('analysisResults', data.error || 'An error occurred');
-     return;
-    }
+      const team = document.getElementById('teamSelect').value;
 
-    // DISPLAY RESULTS
-    displayAnalysisResults(data);
-   } catch (error) {
-    showError('analysisResults', `Error: ${error.message}`);
-   }
-  });
+      if (!team) {
+        showError('statsResults', 'Please select a team');
+        return;
+      }
 
-  // STATS FORM SUBMISSION
-  document.getElementById('statsForm').addEventListener('submit', async (e) => {
-   e.preventDefault();
+      // SHOW LOADING STATE
+      const resultsDiv = document.getElementById('statsResults');
+      resultsDiv.classList.add('show');
+      document.getElementById('statsContent').innerHTML = '<div class="loading"><div class="spinner"></div>Loading statistics...</div>';
 
-   const team = document.getElementById('teamSelect').value;
+      try {
+        // SEND REQUEST TO FLASK BACKEND
+        const formData = new FormData();
+        formData.append('team', team);
 
-   if (!team) {
-    showError('statsResults', 'Please select a team');
-    return;
-   }
+        const response = await fetch('/stats', {
+          method: 'POST',
+          body: formData
+        });
 
-   // SHOW LOADING STATE
-   const resultsDiv = document.getElementById('statsResults');
-   resultsDiv.classList.add('show');
-   document.getElementById('statsContent').innerHTML = '<div class="loading"><div class="spinner"></div>Loading statistics...</div>';
+        const data = await response.json();
 
-   try {
-    // SEND REQUEST TO FLASK BACKEND
-    const formData = new FormData();
-    formData.append('team', team);
+        if (!response.ok || data.error) {
+          showError('statsResults', data.error || 'An error occurred');
+          return;
+        }
 
-    const response = await fetch('/stats', {
-     method: 'POST',
-     body: formData
+        // DISPLAY STATS
+        displayStats(data.stats);
+      } catch (error) {
+        showError('statsResults', `Error: ${error.message}`);
+      }
     });
 
-    const data = await response.json();
+    // HEATMAP BUTTON SUBMISSION
+    document.getElementById('heatmapBtn').addEventListener('click', async () => {
+      const team = document.getElementById('teamSelect').value;
 
-    if (!response.ok || data.error) {
-     showError('statsResults', data.error || 'An error occurred');
-     return;
-    }
+      if (!team) {
+        showError('statsResults', 'Please select a team first');
+        return;
+      }
 
-    // DISPLAY STATS
-    displayStats(data.stats);
-   } catch (error) {
-    showError('statsResults', `Error: ${error.message}`);
-   }
-  });
+      // SHOW LOADING STATE
+      const resultsDiv = document.getElementById('statsResults');
+      resultsDiv.classList.add('show');
+      document.getElementById('statsContent').innerHTML = '<div class="loading"><div class="spinner"></div>Generating venue heatmap...</div>';
 
-  // HEATMAP BUTTON SUBMISSION
-  document.getElementById('heatmapBtn').addEventListener('click', async () => {
-   const team = document.getElementById('teamSelect').value;
+      try {
+        // SEND REQUEST TO FLASK BACKEND
+        const formData = new FormData();
+        formData.append('team', team);
 
-   if (!team) {
-    showError('statsResults', 'Please select a team first');
-    return;
-   }
+        const response = await fetch('/venue-heatmap', {
+          method: 'POST',
+          body: formData
+        });
 
-   // SHOW LOADING STATE
-   const resultsDiv = document.getElementById('statsResults');
-   resultsDiv.classList.add('show');
-   document.getElementById('statsContent').innerHTML = '<div class="loading"><div class="spinner"></div>Generating venue heatmap...</div>';
+        const data = await response.json();
 
-   try {
-    // SEND REQUEST TO FLASK BACKEND
-    const formData = new FormData();
-    formData.append('team', team);
+        if (!response.ok || data.error) {
+          showError('statsResults', data.error || 'An error occurred');
+          return;
+        }
 
-    const response = await fetch('/venue-heatmap', {
-     method: 'POST',
-     body: formData
+        // DISPLAY HEATMAP
+        displayHeatmap(data);
+      } catch (error) {
+        showError('statsResults', `Error: ${error.message}`);
+      }
     });
 
-    const data = await response.json();
+    // FUNCTION: Display analysis results
+    function displayAnalysisResults(data) {
+      const toss = data.toss_analysis;
+      const match = data.match_analysis;
 
-    if (!response.ok || data.error) {
-     showError('statsResults', data.error || 'An error occurred');
-     return;
-    }
-
-    // DISPLAY HEATMAP
-    displayHeatmap(data);
-   } catch (error) {
-    showError('statsResults', `Error: ${error.message}`);
-   }
-  });
-
-  // FUNCTION: Display analysis results
-  function displayAnalysisResults(data) {
-   const toss = data.toss_analysis;
-   const match = data.match_analysis;
-
-   let html = `
+      let html = `
     <div class="result-card">
      <h4>📋 Toss Analysis</h4>
      <p>Venue: <strong>${toss.venue}</strong></p>
@@ -629,21 +632,21 @@
     </div>
    `;
 
-   if (data.graph) {
-    html += `
+      if (data.graph) {
+        html += `
      <div class="visualization">
       <h3>Visual Comparison Chart</h3>
       <img src="${data.graph}" alt="Comparison Chart">
      </div>
     `;
-   }
+      }
 
-   document.getElementById('analysisContent').innerHTML = html;
-  }
+      document.getElementById('analysisContent').innerHTML = html;
+    }
 
-  // FUNCTION: Display quick stats
-  function displayStats(stats) {
-   const html = `
+    // FUNCTION: Display quick stats
+    function displayStats(stats) {
+      const html = `
     <div class="stats-grid">
      <div class="stat-box">
       <h5>Total Matches</h5>
@@ -676,29 +679,29 @@
      </div>
     </div>
    `;
-   document.getElementById('statsContent').innerHTML = html;
-  }
+      document.getElementById('statsContent').innerHTML = html;
+    }
 
-  // FUNCTION: Display venue heatmap
-  function displayHeatmap(data) {
-   const html = `
+    // FUNCTION: Display venue heatmap
+    function displayHeatmap(data) {
+      const html = `
     <div class="visualization">
      <h3>${data.team} - Venue Performance Heatmap</h3>
      <img src="${data.image}" alt="Venue Heatmap">
      <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">Green = Higher win %, Red = Lower win %</p>
     </div>
    `;
-   document.getElementById('statsContent').innerHTML = html;
-  }
+      document.getElementById('statsContent').innerHTML = html;
+    }
 
-  // FUNCTION: Show error messages
-  function showError(containerId, message) {
-   const resultsDiv = document.getElementById(containerId);
-   const contentDiv = containerId === 'analysisResults' ? 'analysisContent' : 'statsContent';
-   resultsDiv.classList.add('show');
-   document.getElementById(contentDiv).innerHTML = `<div class="error-message">⚠️ ${message}</div>`;
-  }
- </script>
+    // FUNCTION: Show error messages
+    function showError(containerId, message) {
+      const resultsDiv = document.getElementById(containerId);
+      const contentDiv = containerId === 'analysisResults' ? 'analysisContent' : 'statsContent';
+      resultsDiv.classList.add('show');
+      document.getElementById(contentDiv).innerHTML = `<div class="error-message">⚠️ ${message}</div>`;
+    }
+  </script>
 </body>
 
 </html>
